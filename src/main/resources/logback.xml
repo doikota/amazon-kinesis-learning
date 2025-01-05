@@ -1,6 +1,6 @@
 <configuration>
-    <!-- デフォルトのログレベルを INFO に設定 -->
-    <root level="INFO">
+    <!-- デフォルトのログレベルを WARN に設定 -->
+    <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 
@@ -14,4 +14,5 @@
     <!-- パッケージごとにログレベルを変更 -->
     <!-- logger name="com.example" level="DEBUG"/-->
     <!-- logger name="org.springframework" level="WARN"/-->
+    <logger name="com.amazonaws.services.kinesis.samples.stocktrades" level="INFO"/>
 </configuration>

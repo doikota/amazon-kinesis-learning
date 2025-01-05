@@ -15,9 +15,6 @@
 
 package com.amazonaws.services.kinesis.samples.stocktrades.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import software.amazon.kinesis.exceptions.InvalidStateException;
 import software.amazon.kinesis.exceptions.ShutdownException;
 import software.amazon.kinesis.exceptions.ThrottlingException;
@@ -29,6 +26,9 @@ import software.amazon.kinesis.lifecycle.events.ShardEndedInput;
 import software.amazon.kinesis.lifecycle.events.ShutdownRequestedInput;
 import software.amazon.kinesis.processor.ShardRecordProcessor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.services.kinesis.samples.stocktrades.model.StockTrade;
 import software.amazon.kinesis.retrieval.KinesisClientRecord;
 
@@ -38,7 +38,7 @@ import software.amazon.kinesis.retrieval.KinesisClientRecord;
  */
 public class StockTradeRecordProcessor implements ShardRecordProcessor {
 
-    private static final Log log = LogFactory.getLog(StockTradeRecordProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StockTradeRecordProcessor.class);
 
     private String kinesisShardId;
 
@@ -56,8 +56,8 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
     @Override
     public void initialize(InitializationInput initializationInput) {
         kinesisShardId = initializationInput.shardId();
-        log.info("Initializing record processor for shard: " + kinesisShardId);
-        log.info("Initializing @ Sequence: " + initializationInput.extendedSequenceNumber().toString());
+        LOG.info("Initializing record processor for shard: " + kinesisShardId);
+        LOG.info("Initializing @ Sequence: " + initializationInput.extendedSequenceNumber().toString());
 
         nextReportingTimeInMillis = System.currentTimeMillis() + REPORTING_INTERVAL_MILLIS;
         nextCheckpointTimeInMillis = System.currentTimeMillis() + CHECKPOINT_INTERVAL_MILLIS;
@@ -66,7 +66,7 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
          try {
-            log.info("Processing " + processRecordsInput.records().size() + " record(s)");
+            LOG.info("Processing " + processRecordsInput.records().size() + " record(s)");
             processRecordsInput.records().forEach(r -> processRecord(r));
             // If it is time to report stats as per the reporting interval, report stats
             if (System.currentTimeMillis() > nextReportingTimeInMillis) {
@@ -81,7 +81,7 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
                 nextCheckpointTimeInMillis = System.currentTimeMillis() + CHECKPOINT_INTERVAL_MILLIS;
             }
         } catch (Throwable t) {
-            log.error("Caught throwable while processing records. Aborting.");
+            LOG.error("Caught throwable while processing records. Aborting.");
             Runtime.getRuntime().halt(1);
         }
 
@@ -115,7 +115,7 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 		StockTrade trade = StockTrade.fromJsonAsBytes(arr);
 		// Ignore the record if the StockTrade object is null
 		if (trade == null) {
-			log.warn(
+			LOG.warn(
 					"Skipping record. Unable to parse record into StockTrade. Partition Key: " + record.partitionKey());
 			return;
 		}
@@ -125,40 +125,40 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 
     @Override
     public void leaseLost(LeaseLostInput leaseLostInput) {
-        log.info("Lost lease, so terminating.");
+        LOG.info("Lost lease, so terminating.");
     }
 
     @Override
     public void shardEnded(ShardEndedInput shardEndedInput) {
         try {
             // Important to checkpoint after reaching end of shard, so we can start processing data from child shards.
-            log.info("Reached shard end checkpointing.");
+            LOG.info("Reached shard end checkpointing.");
             shardEndedInput.checkpointer().checkpoint();
         } catch (ShutdownException | InvalidStateException e) {
-            log.error("Exception while checkpointing at shard end. Giving up.", e);
+            LOG.error("Exception while checkpointing at shard end. Giving up.", e);
         }
     }
 
     @Override
     public void shutdownRequested(ShutdownRequestedInput shutdownRequestedInput) {
-        log.info("Scheduler is shutting down, checkpointing.");
+        LOG.info("Scheduler is shutting down, checkpointing.");
         checkpoint(shutdownRequestedInput.checkpointer());
 
     }
 
     private void checkpoint(RecordProcessorCheckpointer checkpointer) {
-        log.info("Checkpointing shard " + kinesisShardId);
+        LOG.info("Checkpointing shard " + kinesisShardId);
         try {
             checkpointer.checkpoint();
         } catch (ShutdownException se) {
             // Ignore checkpoint if the processor instance has been shutdown (fail over).
-            log.info("Caught shutdown exception, skipping checkpoint.", se);
+            LOG.info("Caught shutdown exception, skipping checkpoint.", se);
         } catch (ThrottlingException e) {
             // Skip checkpoint when throttled. In practice, consider a backoff and retry policy.
-            log.error("Caught throttling exception, skipping checkpoint.", e);
+            LOG.error("Caught throttling exception, skipping checkpoint.", e);
         } catch (InvalidStateException e) {
             // This indicates an issue with the DynamoDB table (check for table, provisioned IOPS).
-            log.error("Cannot save checkpoint to the DynamoDB table used by the Amazon Kinesis Client Library.", e);
+            LOG.error("Cannot save checkpoint to the DynamoDB table used by the Amazon Kinesis Client Library.", e);
         }
     }
 

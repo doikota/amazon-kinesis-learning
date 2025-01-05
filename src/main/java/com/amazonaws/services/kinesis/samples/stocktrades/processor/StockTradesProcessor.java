@@ -17,11 +17,9 @@ package com.amazonaws.services.kinesis.samples.stocktrades.processor;
 
 import java.time.Duration;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
@@ -41,11 +39,7 @@ import software.amazon.kinesis.coordinator.Scheduler;
  */
 public class StockTradesProcessor {
 
-    private static final Log LOG = LogFactory.getLog(StockTradesProcessor.class);
-
-    private static final Logger ROOT_LOGGER = Logger.getLogger("");
-    private static final Logger PROCESSOR_LOGGER =
-            Logger.getLogger("com.amazonaws.services.kinesis.samples.stocktrades.processor.StockTradeRecordProcessor");
+	private static final Logger LOG = LoggerFactory.getLogger(StockTradesProcessor.class);
 
     private static void checkUsage(String[] args) {
         if (args.length != 3) {
@@ -55,23 +49,8 @@ public class StockTradesProcessor {
         }
     }
 
-    /**
-     * Sets the global log level to WARNING and the log level for this package to INFO,
-     * so that we only see INFO messages for this processor. This is just for the purpose
-     * of this tutorial, and should not be considered as best practice.
-     *
-     */
-    private static void setLogLevels() {
-        ROOT_LOGGER.setLevel(Level.WARNING);
-        // Set this to INFO for logging at INFO level. Suppressed for this example as it can be noisy.
-        PROCESSOR_LOGGER.setLevel(Level.INFO);
-    }
-
     public static void main(String[] args) throws Exception {
         checkUsage(args);
-
-        setLogLevels();
-
         String applicationName = args[0];
         String streamName = args[1];
         Region region = Region.of(args[2]);

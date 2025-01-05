@@ -23,8 +23,8 @@ import java.util.concurrent.ExecutionException;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.kinesis.samples.stocktrades.model.StockTrade;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
@@ -39,7 +39,7 @@ import software.amazon.kinesis.common.KinesisClientUtil;
  */
 public class StockTradesWriter {
 
-    private static final Log LOG = LogFactory.getLog(StockTradesWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StockTradesWriter.class);
 
     private static void checkUsage(String[] args) {
         if (args.length != 2) {
