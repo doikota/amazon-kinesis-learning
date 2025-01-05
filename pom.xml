@@ -25,7 +25,32 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-        </plugins>
+	        <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>exec-maven-plugin</artifactId>
+	            <version>3.1.0</version>
+	            <executions>
+	                <execution>
+	                    <id>writer</id>
+	                    <goals>
+	                        <goal>java</goal>
+	                    </goals>
+	                    <configuration>
+	                        <mainClass>com.amazonaws.services.kinesis.samples.stocktrades.writer.StockTradesWriter</mainClass>
+	                    </configuration>
+	                </execution>
+	                <execution>
+	                    <id>processor</id>
+	                    <goals>
+	                        <goal>java</goal>
+	                    </goals>
+	                    <configuration>
+	                        <mainClass>com.amazonaws.services.kinesis.samples.stocktrades.processor.StockTradesProcessor</mainClass>
+	                    </configuration>
+	                </execution>
+	            </executions>
+	        </plugin>
+	    </plugins>
     </build>
 
     <licenses>
