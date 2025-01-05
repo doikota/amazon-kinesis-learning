@@ -15,6 +15,7 @@
 
 package com.amazonaws.services.kinesis.samples.stocktrades.processor;
 
+import java.time.Duration;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,12 +23,13 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.kinesis.common.ConfigsBuilder;
-import software.amazon.kinesis.common.KinesisClientUtil;
 import software.amazon.kinesis.coordinator.Scheduler;
 
 /**
@@ -62,7 +64,7 @@ public class StockTradesProcessor {
     private static void setLogLevels() {
         ROOT_LOGGER.setLevel(Level.WARNING);
         // Set this to INFO for logging at INFO level. Suppressed for this example as it can be noisy.
-        PROCESSOR_LOGGER.setLevel(Level.WARNING);
+        PROCESSOR_LOGGER.setLevel(Level.INFO);
     }
 
     public static void main(String[] args) throws Exception {
@@ -79,11 +81,25 @@ public class StockTradesProcessor {
             System.exit(1);
         }
 
-        KinesisAsyncClient kinesisClient = KinesisClientUtil.createKinesisAsyncClient(KinesisAsyncClient.builder().region(region));
-        DynamoDbAsyncClient dynamoClient = DynamoDbAsyncClient.builder().region(region).build();
-        CloudWatchAsyncClient cloudWatchClient = CloudWatchAsyncClient.builder().region(region).build();
-        StockTradeRecordProcessorFactory shardRecordProcessor = new StockTradeRecordProcessorFactory();
-        ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient, cloudWatchClient, UUID.randomUUID().toString(), shardRecordProcessor);
+        // Netty HTTP クライアントのカスタム設定
+        SdkAsyncHttpClient httpClient = NettyNioAsyncHttpClient.builder()
+                .maxConcurrency(100)  // 最大同時接続数を設定
+                .connectionAcquisitionTimeout(Duration.ofSeconds(10))  // 接続取得待ち時間
+                .connectionTimeout(Duration.ofSeconds(10))  // 接続確立の最大待機時間
+                .readTimeout(Duration.ofSeconds(60))  // 読み込みタイムアウト
+                .writeTimeout(Duration.ofSeconds(30))  // 書き込みタイムアウト
+                .build();        
+        // Kinesis クライアントの作成
+        KinesisAsyncClient kinesisClient = KinesisAsyncClient.builder()
+                .region(Region.AP_NORTHEAST_1)
+                .httpClient(httpClient)  // これを指定
+                .build();
+        
+		DynamoDbAsyncClient dynamoClient = DynamoDbAsyncClient.builder().region(region).build();
+		CloudWatchAsyncClient cloudWatchClient = CloudWatchAsyncClient.builder().region(region).build();
+		StockTradeRecordProcessorFactory shardRecordProcessor = new StockTradeRecordProcessorFactory();
+		ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient,
+				cloudWatchClient, UUID.randomUUID().toString(), shardRecordProcessor);
 
         Scheduler scheduler = new Scheduler(
                 configsBuilder.checkpointConfig(),

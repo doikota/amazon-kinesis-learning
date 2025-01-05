@@ -66,6 +66,21 @@
     </properties>
 
     <dependencies>
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+		    <artifactId>kinesis</artifactId>
+		    <version>2.20.144</version> <!-- 最新バージョンを指定 -->
+		</dependency>
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+		    <artifactId>netty-nio-client</artifactId>
+		    <version>2.20.144</version>  <!-- 最新バージョン -->
+		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.16.1</version>  <!-- 最新バージョンを指定 -->
+		</dependency>
         <dependency>
             <groupId>software.amazon.kinesis</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
@@ -76,9 +91,18 @@
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>
         </dependency>
-    </dependencies>
-
-
-
+	    <!-- SLF4J API -->
+	    <dependency>
+	        <groupId>org.slf4j</groupId>
+	        <artifactId>slf4j-api</artifactId>
+	        <version>2.0.9</version>
+	    </dependency>
+	    <!-- Logback 実装 -->
+	    <dependency>
+	        <groupId>ch.qos.logback</groupId>
+	        <artifactId>logback-classic</artifactId>
+	        <version>1.4.14</version>
+	    </dependency>
+	</dependencies>
 
 </project>

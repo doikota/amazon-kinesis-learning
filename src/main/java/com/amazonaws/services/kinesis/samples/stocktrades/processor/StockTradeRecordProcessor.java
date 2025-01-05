@@ -87,16 +87,40 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 
     }
 
+	/**
+	 * Report the stock stats
+	 */
     private void reportStats() {
-        // TODO: Implement method
+		System.out.println("****** Shard " + kinesisShardId + " stats for last 1 minute ******\n" + stockStats + "\n"
+				+ "****************************************************************\n");
     }
 
+	/**
+	 * Reset the stock stats
+	 */
     private void resetStats() {
-        // TODO: Implement method
+    	stockStats = new StockStats();
     }
 
+    /**
+     * process a single record
+     * @param record
+     */
     private void processRecord(KinesisClientRecord record) {
-        // TODO: Implement method
+
+		byte[] arr = new byte[record.data().remaining()];
+		// Copy the record data to a byte array
+		record.data().get(arr);
+		// Convert the byte array to a StockTrade object
+		StockTrade trade = StockTrade.fromJsonAsBytes(arr);
+		// Ignore the record if the StockTrade object is null
+		if (trade == null) {
+			log.warn(
+					"Skipping record. Unable to parse record into StockTrade. Partition Key: " + record.partitionKey());
+			return;
+		}
+		// Update the stock stats for the record
+		stockStats.addStockTrade(trade);
     }
 
     @Override
