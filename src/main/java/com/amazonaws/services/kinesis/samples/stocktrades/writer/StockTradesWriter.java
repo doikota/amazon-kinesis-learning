@@ -91,7 +91,9 @@ public class StockTradesWriter {
 		PutRecordRequest request = PutRecordRequest.builder().partitionKey(trade.getTickerSymbol())
 				.streamName(streamName).data(SdkBytes.fromByteArray(bytes)).build();
 		try {
-			kinesisClient.putRecord(request).get();
+			Object o = kinesisClient.putRecord(request).get();
+			LOG.info("ShardId: " + ((software.amazon.awssdk.services.kinesis.model.PutRecordResponse) o).shardId());
+			LOG.info("SequenceNumber: " + ((software.amazon.awssdk.services.kinesis.model.PutRecordResponse) o).sequenceNumber());
 		} catch (InterruptedException e) {
 			LOG.info("Interrupted, assuming shutdown.");
 		} catch (ExecutionException e) {

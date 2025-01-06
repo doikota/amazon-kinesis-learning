@@ -66,20 +66,24 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
          try {
-            LOG.info("Processing " + processRecordsInput.records().size() + " record(s)");
-            processRecordsInput.records().forEach(r -> processRecord(r));
-            // If it is time to report stats as per the reporting interval, report stats
-            if (System.currentTimeMillis() > nextReportingTimeInMillis) {
-                reportStats();
-                resetStats();
-                nextReportingTimeInMillis = System.currentTimeMillis() + REPORTING_INTERVAL_MILLIS;
-            }
-
-            // Checkpoint once every checkpoint interval
-            if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
-                checkpoint(processRecordsInput.checkpointer());
-                nextCheckpointTimeInMillis = System.currentTimeMillis() + CHECKPOINT_INTERVAL_MILLIS;
-            }
+        	// Retrieve the records from the input
+         	LOG.info("Processing " + processRecordsInput.records().size() + " records");
+        	LOG.info("ShardId: " + kinesisShardId);
+			// Process records and report stats 
+			processRecordsInput.records().forEach(r -> processRecord(r));
+			
+			// If it is time to report stats as per the reporting interval, report stats
+			if (System.currentTimeMillis() > nextReportingTimeInMillis) {
+			    reportStats();
+			    resetStats();
+			    nextReportingTimeInMillis = System.currentTimeMillis() + REPORTING_INTERVAL_MILLIS;
+			}
+			
+			// Checkpoint once every checkpoint interval
+			if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
+			    checkpoint(processRecordsInput.checkpointer());
+			    nextCheckpointTimeInMillis = System.currentTimeMillis() + CHECKPOINT_INTERVAL_MILLIS;
+			}
         } catch (Throwable t) {
             LOG.error("Caught throwable while processing records. Aborting.");
             Runtime.getRuntime().halt(1);
@@ -119,6 +123,9 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 					"Skipping record. Unable to parse record into StockTrade. Partition Key: " + record.partitionKey());
 			return;
 		}
+		LOG.info("Processing trade: " + trade.toString());
+        LOG.info("Sequence number: " + record.sequenceNumber());
+		
 		// Update the stock stats for the record
 		stockStats.addStockTrade(trade);
     }
