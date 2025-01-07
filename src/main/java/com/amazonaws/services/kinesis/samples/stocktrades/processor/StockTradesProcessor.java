@@ -24,10 +24,12 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.kinesis.common.ConfigsBuilder;
+import software.amazon.kinesis.common.InitialPositionInStream;
+import software.amazon.kinesis.common.InitialPositionInStreamExtended;
 import software.amazon.kinesis.coordinator.Scheduler;
 
 /**
@@ -79,6 +81,10 @@ public class StockTradesProcessor {
 		StockTradeRecordProcessorFactory shardRecordProcessor = new StockTradeRecordProcessorFactory();
 		ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, applicationName, kinesisClient, dynamoClient,
 				cloudWatchClient, UUID.randomUUID().toString(), shardRecordProcessor);
+		
+		// 初期位置を TRIM_HORIZON に設定 (DynamoDBのLease テーブルのcheckpointもTRIM_HORIZONで設定されている必要あり）
+		InitialPositionInStreamExtended initialPosition = 
+		    InitialPositionInStreamExtended.newInitialPosition(InitialPositionInStream.TRIM_HORIZON);
 
         Scheduler scheduler = new Scheduler(
                 configsBuilder.checkpointConfig(),
@@ -87,8 +93,7 @@ public class StockTradesProcessor {
                 configsBuilder.lifecycleConfig(),
                 configsBuilder.metricsConfig(),
                 configsBuilder.processorConfig(),
-                configsBuilder.retrievalConfig()
-        );
+				configsBuilder.retrievalConfig().initialPositionInStreamExtended(initialPosition));
         int exitCode = 0;
         try {
             scheduler.run();
