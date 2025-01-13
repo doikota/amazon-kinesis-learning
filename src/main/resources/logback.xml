@@ -1,18 +1,30 @@
 <configuration>
-    <!-- デフォルトのログレベルを WARN に設定 -->
-    <root level="WARN">
-        <appender-ref ref="STDOUT"/>
-    </root>
+	<!-- コンソール出力の設定 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
 
-    <!-- コンソール出力の設定 -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+	<!-- CloudWatch へログを送るための設定 -->
+	<appender name="CLOUDWATCH" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+		<region>ap-northeast-1</region>
+		<logGroup>golden-kinesis-application</logGroup>
+		<logStream>golden-kinesis-application-stream</logStream>
+		<layout>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+		</layout>
+	</appender>
 
-    <!-- パッケージごとにログレベルを変更 -->
-    <!-- logger name="com.example" level="DEBUG"/-->
-    <!-- logger name="org.springframework" level="WARN"/-->
-    <logger name="com.amazonaws.services.kinesis.samples.stocktrades" level="INFO"/>
+	<!-- デフォルトのログレベルを INFO に設定 -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="CLOUDWATCH" />
+	</root>
+		
+	<!-- パッケージごとにログレベルを変更 -->
+	<!-- logger name="com.example" level="DEBUG"/ -->
+	<!-- logger name="org.springframework" level="WARN"/ -->
+	<logger
+		name="com.amazonaws.services.kinesis.samples.stocktrades" level="INFO" />
 </configuration>

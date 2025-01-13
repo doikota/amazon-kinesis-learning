@@ -18,19 +18,18 @@ package com.amazonaws.services.kinesis.samples.stocktrades.writer;
 
 import java.util.concurrent.ExecutionException;
 
-
-
-import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.kinesis.samples.stocktrades.model.StockTrade;
+
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.PutRecordRequest;
-import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
+import software.amazon.awssdk.services.kinesis.model.PutRecordResponse;
 import software.amazon.kinesis.common.KinesisClientUtil;
 
 /**
@@ -88,12 +87,12 @@ public class StockTradesWriter {
 
 		LOG.info("Putting trade: " + trade.toString());
 		// We use the ticker symbol as the partition key
-		PutRecordRequest request = PutRecordRequest.builder().partitionKey(trade.getTickerSymbol())
+		PutRecordRequest request = PutRecordRequest.builder().partitionKey(trade.getTicker())
 				.streamName(streamName).data(SdkBytes.fromByteArray(bytes)).build();
 		try {
-			Object o = kinesisClient.putRecord(request).get();
-			LOG.info("ShardId: " + ((software.amazon.awssdk.services.kinesis.model.PutRecordResponse) o).shardId());
-			LOG.info("SequenceNumber: " + ((software.amazon.awssdk.services.kinesis.model.PutRecordResponse) o).sequenceNumber());
+			PutRecordResponse responce = kinesisClient.putRecord(request).get();
+			LOG.info("ShardId: {}", responce.shardId());
+			LOG.info("SequenceNumber: {}",  responce.sequenceNumber());
 		} catch (InterruptedException e) {
 			LOG.info("Interrupted, assuming shutdown.");
 		} catch (ExecutionException e) {

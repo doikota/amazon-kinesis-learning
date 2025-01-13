@@ -61,23 +61,23 @@ public class StockStats {
         // update buy/sell count
         TradeType type = trade.getTradeType();
         Map<String, Long> counts = countsByTradeType.get(type);
-        Long count = counts.get(trade.getTickerSymbol());
+        Long count = counts.get(trade.getTicker());
         if (count == null) {
             count = 0L;
         }
-        counts.put(trade.getTickerSymbol(), ++count);
+        counts.put(trade.getTicker(), ++count);
 
         // update most popular stock
         String mostPopular = mostPopularByTradeType.get(type);
         if (mostPopular == null ||
                 countsByTradeType.get(type).get(mostPopular) < count) {
-            mostPopularByTradeType.put(type, trade.getTickerSymbol());
+            mostPopularByTradeType.put(type, trade.getTicker());
         }
         
         // update largest sell order
         if (type == TradeType.SELL) {
             if (largestSellOrderStock == null || trade.getQuantity() > largestSellOrderQuantity) {
-                largestSellOrderStock = trade.getTickerSymbol();
+                largestSellOrderStock = trade.getTicker();
                 largestSellOrderQuantity = trade.getQuantity();
             }
         }

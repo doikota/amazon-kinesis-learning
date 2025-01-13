@@ -41,7 +41,7 @@ import software.amazon.kinesis.coordinator.Scheduler;
  */
 public class StockTradesProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StockTradesProcessor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StockTradesProcessor.class);
 
     private static void checkUsage(String[] args) {
         if (args.length != 3) {
@@ -69,7 +69,7 @@ public class StockTradesProcessor {
                 .connectionTimeout(Duration.ofSeconds(10))  // 接続確立の最大待機時間
                 .readTimeout(Duration.ofSeconds(60))  // 読み込みタイムアウト
                 .writeTimeout(Duration.ofSeconds(30))  // 書き込みタイムアウト
-                .build();        
+                .build();
         // Kinesis クライアントの作成
         KinesisAsyncClient kinesisClient = KinesisAsyncClient.builder()
                 .region(Region.AP_NORTHEAST_1)
@@ -98,7 +98,7 @@ public class StockTradesProcessor {
         try {
             scheduler.run();
         } catch (Throwable t) {
-            LOG.error("Caught throwable while processing data.", t);
+            LOGGER.error("Caught throwable while processing data.", t);
             exitCode = 1;
         }
         System.exit(exitCode);

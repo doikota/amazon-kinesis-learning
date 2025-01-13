@@ -28,7 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class StockTrade {
 
     private final static ObjectMapper JSON = new ObjectMapper();
-    static {
+    
+	static {
         JSON.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
@@ -40,25 +41,29 @@ public class StockTrade {
         SELL
     }
 
-    private String tickerSymbol;
+    private long id;
+    private String ticker;
     private TradeType tradeType;
     private double price;
     private long quantity;
-    private long id;
 
     public StockTrade() {
     }
 
-    public StockTrade(String tickerSymbol, TradeType tradeType, double price, long quantity, long id) {
-        this.tickerSymbol = tickerSymbol;
+    public StockTrade(String ticker, TradeType tradeType, double price, long quantity, long id) {
+        this.ticker = ticker;
         this.tradeType = tradeType;
         this.price = price;
         this.quantity = quantity;
         this.id = id;
     }
 
-    public String getTickerSymbol() {
-        return tickerSymbol;
+    public long getId() {
+        return id;
+    }
+
+    public String getTicker() {
+        return ticker;
     }
 
     public TradeType getTradeType() {
@@ -73,9 +78,21 @@ public class StockTrade {
         return quantity;
     }
 
-    public long getId() {
-        return id;
-    }
+    public void setTicker(String ticker) {
+		this.ticker = ticker;
+	}
+
+	public void setTradeType(TradeType tradeType) {
+		this.tradeType = tradeType;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
 
     public byte[] toJsonAsBytes() {
         try {
@@ -96,7 +113,7 @@ public class StockTrade {
     @Override
     public String toString() {
         return String.format("ID %d: %s %d %s $%.02f",
-                id, tradeType, quantity, tickerSymbol, price);
+                id, tradeType, quantity, ticker, price);
     }
 
 }
