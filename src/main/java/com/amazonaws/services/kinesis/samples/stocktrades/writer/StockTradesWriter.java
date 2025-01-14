@@ -118,7 +118,7 @@ public class StockTradesWriter {
 
         // Repeatedly send stock trades with a 10000 milliseconds wait in between
         StockTradeGenerator stockTradeGenerator = new StockTradeGenerator();
-        while(true) {
+        while (true) {
             StockTrade trade = stockTradeGenerator.getRandomTrade();
             sendStockTrade(trade, kinesisClient, streamName);
             Thread.sleep(10000);

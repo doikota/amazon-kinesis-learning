@@ -46,16 +46,18 @@ public class StockTrade {
     private TradeType tradeType;
     private double price;
     private long quantity;
+    private String eventTime;
 
     public StockTrade() {
     }
 
-    public StockTrade(String ticker, TradeType tradeType, double price, long quantity, long id) {
+    public StockTrade(String ticker, TradeType tradeType, double price, long quantity, long id, String eventTime) {
         this.ticker = ticker;
         this.tradeType = tradeType;
         this.price = price;
         this.quantity = quantity;
         this.id = id;
+        this.eventTime = eventTime;
     }
 
     public long getId() {
@@ -78,7 +80,11 @@ public class StockTrade {
         return quantity;
     }
 
-    public void setTicker(String ticker) {
+    public String getEventTime() {
+		return eventTime;
+	}
+
+	public void setTicker(String ticker) {
 		this.ticker = ticker;
 	}
 
@@ -92,6 +98,10 @@ public class StockTrade {
 
 	public void setQuantity(long quantity) {
 		this.quantity = quantity;
+	}
+
+	public void setEventTime(String eventTime) {
+		this.eventTime = eventTime;
 	}
 
     public byte[] toJsonAsBytes() {
@@ -112,8 +122,8 @@ public class StockTrade {
 
     @Override
     public String toString() {
-        return String.format("ID %d: %s %d %s $%.02f",
-                id, tradeType, quantity, ticker, price);
+        return String.format("ID %d: %s %d %s $%.02f, %s",
+                id, tradeType, quantity, ticker, price, eventTime);
     }
 
 }

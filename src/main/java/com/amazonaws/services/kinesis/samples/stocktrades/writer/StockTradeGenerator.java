@@ -15,6 +15,8 @@
 
 package com.amazonaws.services.kinesis.samples.stocktrades.writer;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -95,7 +97,10 @@ public class StockTradeGenerator {
         long quantity = random.nextInt(MAX_QUANTITY) + 1; // add 1 because nextInt() will return between 0 (inclusive)
                                                           // and MAX_QUANTITY (exclusive). we want at least 1 share.
 
-        return new StockTrade(stockPrice.tickerSymbol, tradeType, price, quantity, id.getAndIncrement());
+        // set the event time to now
+        String eventTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        return new StockTrade(stockPrice.tickerSymbol, tradeType, price, quantity, id.getAndIncrement(), eventTime);
     }
 
     private static class StockPrice {

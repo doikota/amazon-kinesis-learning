@@ -111,11 +111,6 @@ public class StockTradeRecordProcessor implements ShardRecordProcessor {
 		LOGGER.info("Processing trade: {}", trade);
         LOGGER.info("Sequence number: {}", clientRecord.sequenceNumber());
         
-        // Transform the record
-        StockTrade transformedTrade = new StockTrade(trade.getTicker(), trade.getTradeType(), trade.getPrice(), trade.getQuantity(), trade.getId());
-        transformedTrade.setPrice(transformedTrade.getPrice() * 10);
-        LOGGER.info("Transformed trade: {}", transformedTrade);
-		
 		// Update the stock stats for the record
 		stockStats.addStockTrade(trade);
     }
