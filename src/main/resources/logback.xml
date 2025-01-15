@@ -1,8 +1,11 @@
 <configuration>
+
+	<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
 	<!-- コンソール出力の設定 -->
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{HH:mm:ss.SSS} %p %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
@@ -12,7 +15,7 @@
 		<logGroup>golden-kinesis-application</logGroup>
 		<logStream>golden-kinesis-application-stream</logStream>
 		<layout>
-			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%d{HH:mm:ss.SSS} %p %logger{36} - %msg%n</pattern>
 		</layout>
 	</appender>
 
@@ -23,8 +26,8 @@
 	</root>
 		
 	<!-- パッケージごとにログレベルを変更 -->
-	<!-- logger name="com.example" level="DEBUG"/ -->
-	<!-- logger name="org.springframework" level="WARN"/ -->
-	<logger
-		name="com.amazonaws.services.kinesis.samples.stocktrades" level="INFO" />
+	<logger name="com.amazonaws.util" level="ERROR" />
+	<logger name="com.amazonaws.internal" level="ERROR" />
+	<logger name="com.amazonaws.services.kinesis.samples.stocktrades" level="INFO" />
+	
 </configuration>

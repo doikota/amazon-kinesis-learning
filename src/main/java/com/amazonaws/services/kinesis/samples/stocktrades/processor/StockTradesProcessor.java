@@ -17,9 +17,11 @@ package com.amazonaws.services.kinesis.samples.stocktrades.processor;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
@@ -41,6 +43,13 @@ import software.amazon.kinesis.coordinator.Scheduler;
  */
 public class StockTradesProcessor {
 
+	static {
+	    // 既存の java.util.logging 設定をリセット
+	    LogManager.getLogManager().reset();
+	    // JUL のログを SLF4J に転送
+	    SLF4JBridgeHandler.install();
+    }
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(StockTradesProcessor.class);
 
     private static void checkUsage(String[] args) {

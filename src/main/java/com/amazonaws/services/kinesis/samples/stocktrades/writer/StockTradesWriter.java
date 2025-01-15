@@ -17,9 +17,11 @@ package com.amazonaws.services.kinesis.samples.stocktrades.writer;
 
 
 import java.util.concurrent.ExecutionException;
+import java.util.logging.LogManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.amazonaws.services.kinesis.samples.stocktrades.model.StockTrade;
 
@@ -38,6 +40,13 @@ import software.amazon.kinesis.common.KinesisClientUtil;
  */
 public class StockTradesWriter {
 
+	static {
+	    // 既存の java.util.logging 設定をリセット
+	    LogManager.getLogManager().reset();
+	    // JUL のログを SLF4J に転送
+	    SLF4JBridgeHandler.install();
+    }
+	
     private static final Logger LOG = LoggerFactory.getLogger(StockTradesWriter.class);
 
     private static void checkUsage(String[] args) {
